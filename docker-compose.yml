@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  customers:
+    build: src/customers/.
+    expose:
+      - "8080"
+    environment:
+      - HISTORIES_URL=http://histories:8081
+      - REVIEWS_URL=reviews:8082
+    ports:
+      - 8080:8080
+    networks:
+      - customers
+  histories:
+    build: src/histories/.
+    environment:
+      - ITEMS_URL=http://items:8083
+    expose:
+      - 8081
+    networks:
+      - customers
+  reviews:
+    build: src/reviews/.
+    environment:
+      - ITEMS_URL=http://items:8083
+    expose:
+      - 8082
+    networks:
+      - customers
+  items:
+    build: src/items/.
+    expose:
+      - 8083
+    networks:
+      - customers
+
+networks:
+  customers:

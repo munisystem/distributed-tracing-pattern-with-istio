@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package review;
+option go_package = "pb";
+
+service Review {
+  rpc GetCustomerReview( GetCustomerReviewRequest ) returns ( GetCustomerReviewResponse ) {}
+}
+
+message GetCustomerReviewRequest {
+  int64 customer_id = 1;
+}
+
+message GetCustomerReviewResponse {
+  int64 id = 1;
+  int64 customer_id = 2;
+  string item_name = 3;
+  int64 rating = 4;
+  string description = 5;
+}
