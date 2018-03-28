@@ -1,0 +1,174 @@
+##################################
+# items                          #
+##################################
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: items
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: items
+  namespace: items
+  labels:
+    app: items
+spec:
+  ports:
+  - port: 8083
+    name: http
+  selector:
+    app: items
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: items
+  namespace: items
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: items
+    spec:
+      containers:
+      - name: items
+        image: munisystem/distributed-tracing-with-istio-items:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8083
+---
+##################################
+# reviews                        #
+##################################
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: reviews
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews
+  namespace: reviews
+  labels:
+    app: reviews
+spec:
+  ports:
+  - port: 8082
+    name: http
+  selector:
+    app: reviews
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: reviews
+  namespace: reviews
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: reviews
+    spec:
+      containers:
+      - name: reviews
+        image: munisystem/distributed-tracing-with-istio-reviews:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8082
+        env:
+          - name: ITEMS_URL
+            value: http://items.items.svc.cluster.local:8083
+---
+##################################
+# histories                      #
+##################################
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: histories
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: histories
+  namespace: histories
+  labels:
+    app: histories
+spec:
+  ports:
+  - port: 8081
+    name: http
+  selector:
+    app: histories
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: histories
+  namespace: histories
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: histories
+    spec:
+      containers:
+      - name: histories
+        image: munisystem/distributed-tracing-with-istio-histories:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8081
+        env:
+          - name: ITEMS_URL
+            value: http://items.items.svc.cluster.local:8083
+---
+##################################
+# customers                      #
+##################################
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: customers
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: customers
+  namespace: customers
+  labels:
+    app: customers
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: customers
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: customers
+  namespace: customers
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: customers
+    spec:
+      containers:
+      - name: customers
+        image: munisystem/distributed-tracing-with-istio-customers:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+        env:
+          - name: HISTORIES_URL
+            value: http://histories.histories.svc.cluster.local:8081
+          - name: REVIEWS_URL
+            value: reviews.reviews.svc.cluster.local:8082
